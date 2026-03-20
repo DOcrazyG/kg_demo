@@ -5,6 +5,7 @@ description = "Knowledge Graph Demo"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "openai>=1.0",
     "pydantic>=2.0",
     "pydantic-settings>=2.0",
 ]
@@ -12,8 +13,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "pytest-asyncio>=0.24",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+asyncio_mode = "auto"
