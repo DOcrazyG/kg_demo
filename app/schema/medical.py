@@ -16,23 +16,6 @@ def edge(label: str, **kwargs: Any) -> Any:
     return Field(json_schema_extra={"edge_label": label}, **kwargs)
 
 
-KG_RELATIONS = {
-    "disease_has_symptom",
-    "disease_acompany_disease",
-    "disease_belong_department",
-    "disease_common_drug",
-    "disease_recommand_drug",
-    "disease_eat_food",
-    "disease_noteat_food",
-    "disease_recommand_food",
-    "disease_need_check",
-    "disease_need_treatment",
-    "department_belong_department",
-    "drug_relate_producer",
-    "SameAs",
-}
-
-
 class DocumentType(str, Enum):
     OUTPATIENT_RECORD = "Outpatient Record"
     INPATIENT_RECORD = "Inpatient Record"
@@ -75,12 +58,8 @@ class Address(BaseModel):
 class VitalSigns(BaseModel):
     model_config = ConfigDict(is_entity=False)
 
-    blood_pressure_systolic: float | None = Field(
-        None, description="Systolic blood pressure (mmHg)"
-    )
-    blood_pressure_diastolic: float | None = Field(
-        None, description="Diastolic blood pressure (mmHg)"
-    )
+    blood_pressure_systolic: float | None = Field(None, description="Systolic blood pressure (mmHg)")
+    blood_pressure_diastolic: float | None = Field(None, description="Diastolic blood pressure (mmHg)")
     heart_rate: float | None = Field(None, description="Heart rate (bpm)")
     temperature: float | None = Field(None, description="Body temperature (°C)")
     respiratory_rate: float | None = Field(None, description="Respiratory rate (/min)")
