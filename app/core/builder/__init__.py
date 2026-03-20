@@ -1,0 +1,1 @@
+"""Builder the graph from the entity and relation."""

@@ -1,0 +1,1 @@
+"""Extractor entity and relation from the text."""
