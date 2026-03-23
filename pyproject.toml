@@ -8,6 +8,7 @@ dependencies = [
     "openai>=1.0",
     "pydantic>=2.0",
     "pydantic-settings>=2.0",
+    "neo4j>=5.25.0",
 ]
 
 [project.optional-dependencies]
