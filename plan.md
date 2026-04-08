@@ -14,3 +14,13 @@
 
 # 包管理工具
 uv
+
+# 参考项目
+1. [ai-knowledge-graph](https://github.com/robert-mcdermott/ai-knowledge-graph)
+- triple extraction
+- entity standardization
+- relation inference
+- visualization
+2. [langextract](https://github.com/google/langextract.git)
+3. [Docling Graph](https://github.com/langchain/langgraph.git)
+
