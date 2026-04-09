@@ -19,16 +19,16 @@ class Person(BaseModel):
 
 
 class TestLLMConnection:
-    """Test LLM client connection and basic calls."""
+    """Test LLM client connection and basic chat calls."""
 
-    def test_invoke_simple(self):
+    def test_chat_simple(self):
         """Non-streaming: simple string prompt."""
         client = LLMClient()
         resp = client.chat("Say hello in one word.")
         assert isinstance(resp, str)
         assert len(resp) > 0
 
-    def test_invoke_with_system(self):
+    def test_chat_with_system(self):
         """Non-streaming: with system prompt."""
         client = LLMClient()
         resp = client.chat(
@@ -38,7 +38,7 @@ class TestLLMConnection:
         assert isinstance(resp, str)
         assert len(resp) > 0
 
-    def test_invoke_with_messages(self):
+    def test_chat_with_messages(self):
         """Non-streaming: message list."""
         client = LLMClient()
         messages = [ChatMessage("user", "What is 1+1? Reply with just the number.")]
@@ -46,7 +46,7 @@ class TestLLMConnection:
         assert isinstance(resp, str)
         assert len(resp) > 0
 
-    def test_stream_simple(self):
+    def test_stream_chat_simple(self):
         """Streaming: yields chunks."""
         client = LLMClient()
         chunks = list(client.stream_chat("Count from 1 to 3."))
@@ -54,7 +54,7 @@ class TestLLMConnection:
         full = "".join(chunks)
         assert len(full) > 0
 
-    def test_stream_yields_strings(self):
+    def test_stream_chat_yields_strings(self):
         """Streaming: each chunk is non-empty string when present."""
         client = LLMClient()
         for chunk in client.stream_chat("Hi"):

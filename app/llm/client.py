@@ -1,12 +1,17 @@
-"""LLM client using OpenAI SDK. Supports streaming and non-streaming."""
+"""LLM client using OpenAI SDK. Supports streaming and non-streaming chat."""
 
+from __future__ import annotations
+
+import json
 from collections.abc import AsyncIterator, Iterator
-from typing import Type
+from typing import TypeVar
 
 from openai import AsyncOpenAI, OpenAI
 from pydantic import BaseModel
 
 from app.config import get_provider_config, get_runtime_config
+
+TModel = TypeVar("TModel", bound=BaseModel)
 
 
 def ChatMessage(role: str, content: str) -> dict[str, str]:
@@ -74,9 +79,7 @@ class LLMClient:
         temperature: float | None = None,
         max_tokens: int | None = None,
     ) -> str:
-        """
-        Non-streaming chat completion. Returns full response text.
-        """
+        """Non-streaming chat completion. Returns full response text."""
         msgs = self._to_messages(messages, system)
         resp = self._client.chat.completions.create(
             model=model or self._model,
@@ -97,44 +100,18 @@ class LLMClient:
         temperature: float | None = None,
         max_tokens: int | None = None,
     ) -> Iterator[str]:
-        """
-        Streaming chat completion. Yields content chunks.
-        """
+        """Streaming chat completion. Yields content chunks."""
         msgs = self._to_messages(messages, system)
-        stream = self._client.chat.completions.create(
+        completion_stream = self._client.chat.completions.create(
             model=model or self._model,
             messages=msgs,
             temperature=temperature if temperature is not None else self._temperature,
             max_tokens=max_tokens or self._max_tokens,
             stream=True,
         )
-        for chunk in stream:
+        for chunk in completion_stream:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
-
-    def extract(
-        self,
-        messages: list[dict[str, str]] | str,
-        response_model: Type[BaseModel],
-        *,
-        system: str | None = None,
-        model: str | None = None,
-        temperature: float | None = None,
-        max_tokens: int | None = None,
-    ) -> BaseModel:
-        """
-        Extract structured data using response_model.
-        Uses .parse() method to return a Pydantic BaseModel instance.
-        """
-        msgs = self._to_messages(messages, system)
-        resp = self._client.chat.completions.parse(
-            model=model or self._model,
-            messages=msgs,
-            response_format=response_model,
-            temperature=temperature if temperature is not None else self._temperature,
-            max_tokens=max_tokens or self._max_tokens,
-        )
-        return resp.choices[0].message.parsed
 
     async def chat_async(
         self,
@@ -168,34 +145,75 @@ class LLMClient:
     ) -> AsyncIterator[str]:
         """Async streaming chat completion. Yields content chunks."""
         msgs = self._to_messages(messages, system)
-        stream = await self._async_client.chat.completions.create(
+        completion_stream = await self._async_client.chat.completions.create(
             model=model or self._model,
             messages=msgs,
             temperature=temperature if temperature is not None else self._temperature,
             max_tokens=max_tokens or self._max_tokens,
             stream=True,
         )
-        async for chunk in stream:
+        async for chunk in completion_stream:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
 
-    async def extract_async(
+    def extract(
         self,
         messages: list[dict[str, str]] | str,
-        response_model: Type[BaseModel],
+        response_model: type[TModel],
         *,
         system: str | None = None,
         model: str | None = None,
         temperature: float | None = None,
         max_tokens: int | None = None,
-    ) -> BaseModel:
-        """Async extract structured data using response_model."""
-        msgs = self._to_messages(messages, system)
-        resp = await self._async_client.chat.completions.parse(
+    ) -> TModel:
+        """Chat completion with JSON object output, parsed into ``response_model``."""
+        if not (isinstance(response_model, type) and issubclass(response_model, BaseModel)):
+            raise TypeError("response_model must be a Pydantic BaseModel subclass")
+        keys = list(response_model.model_fields.keys())
+        json_hint = (
+            "Respond with a single JSON object only, with these keys: "
+            f"{keys}. Use JSON types (strings, numbers, booleans). No markdown or extra text."
+        )
+        full_system = f"{system}\n{json_hint}" if system else json_hint
+        msgs = self._to_messages(messages, full_system)
+        resp = self._client.chat.completions.create(
             model=model or self._model,
             messages=msgs,
-            response_format=response_model,
             temperature=temperature if temperature is not None else self._temperature,
             max_tokens=max_tokens or self._max_tokens,
+            stream=False,
+            response_format={"type": "json_object"},
         )
-        return resp.choices[0].message.parsed
+        raw = resp.choices[0].message.content or "{}"
+        return response_model.model_validate(json.loads(raw))
+
+    async def extract_async(
+        self,
+        messages: list[dict[str, str]] | str,
+        response_model: type[TModel],
+        *,
+        system: str | None = None,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+    ) -> TModel:
+        """Async chat completion with JSON object output, parsed into ``response_model``."""
+        if not (isinstance(response_model, type) and issubclass(response_model, BaseModel)):
+            raise TypeError("response_model must be a Pydantic BaseModel subclass")
+        keys = list(response_model.model_fields.keys())
+        json_hint = (
+            "Respond with a single JSON object only, with these keys: "
+            f"{keys}. Use JSON types (strings, numbers, booleans). No markdown or extra text."
+        )
+        full_system = f"{system}\n{json_hint}" if system else json_hint
+        msgs = self._to_messages(messages, full_system)
+        resp = await self._async_client.chat.completions.create(
+            model=model or self._model,
+            messages=msgs,
+            temperature=temperature if temperature is not None else self._temperature,
+            max_tokens=max_tokens or self._max_tokens,
+            stream=False,
+            response_format={"type": "json_object"},
+        )
+        raw = resp.choices[0].message.content or "{}"
+        return response_model.model_validate(json.loads(raw))
