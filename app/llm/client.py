@@ -1,8 +1,10 @@
 """LLM client using OpenAI SDK. Supports streaming and non-streaming."""
 
 from collections.abc import AsyncIterator, Iterator
+from typing import Type
 
 from openai import AsyncOpenAI, OpenAI
+from pydantic import BaseModel
 
 from app.config import get_provider_config, get_runtime_config
 
@@ -63,7 +65,7 @@ class LLMClient:
             out.append(m)
         return out
 
-    def invoke(
+    def chat(
         self,
         messages: list[dict[str, str]] | str,
         *,
@@ -86,7 +88,7 @@ class LLMClient:
         choice = resp.choices[0]
         return choice.message.content or ""
 
-    def stream(
+    def stream_chat(
         self,
         messages: list[dict[str, str]] | str,
         *,
@@ -110,7 +112,31 @@ class LLMClient:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
 
-    async def invoke_async(
+    def extract(
+        self,
+        messages: list[dict[str, str]] | str,
+        response_model: Type[BaseModel],
+        *,
+        system: str | None = None,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+    ) -> BaseModel:
+        """
+        Extract structured data using response_model.
+        Uses .parse() method to return a Pydantic BaseModel instance.
+        """
+        msgs = self._to_messages(messages, system)
+        resp = self._client.chat.completions.parse(
+            model=model or self._model,
+            messages=msgs,
+            response_format=response_model,
+            temperature=temperature if temperature is not None else self._temperature,
+            max_tokens=max_tokens or self._max_tokens,
+        )
+        return resp.choices[0].message.parsed
+
+    async def chat_async(
         self,
         messages: list[dict[str, str]] | str,
         *,
@@ -131,7 +157,7 @@ class LLMClient:
         choice = resp.choices[0]
         return choice.message.content or ""
 
-    async def stream_async(
+    async def stream_chat_async(
         self,
         messages: list[dict[str, str]] | str,
         *,
@@ -152,3 +178,24 @@ class LLMClient:
         async for chunk in stream:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
+
+    async def extract_async(
+        self,
+        messages: list[dict[str, str]] | str,
+        response_model: Type[BaseModel],
+        *,
+        system: str | None = None,
+        model: str | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+    ) -> BaseModel:
+        """Async extract structured data using response_model."""
+        msgs = self._to_messages(messages, system)
+        resp = await self._async_client.chat.completions.parse(
+            model=model or self._model,
+            messages=msgs,
+            response_format=response_model,
+            temperature=temperature if temperature is not None else self._temperature,
+            max_tokens=max_tokens or self._max_tokens,
+        )
+        return resp.choices[0].message.parsed
