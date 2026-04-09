@@ -25,7 +25,6 @@ from .entity import (
     VitalSign,
     LabValue,
     BaseEntity,
-    EntityType,
     get_entity_class,
     ENTITY_TYPE_MAPPING,
 )
@@ -58,7 +57,14 @@ from .relation import (
     RELATION_TYPE_MAPPING,
 )
 from .base import BaseGraph, BaseEntity, BaseRelation
-from ._type import EntityType, RelationType, Severity, AllergyType, ConfidenceLevel
+from ._type import (
+    ENTITY_TYPE_LABEL_ZH,
+    RELATION_TYPE_LABEL_ZH,
+    AllergyType,
+    EntityType,
+    RelationType,
+    Severity,
+)
 
 __all__ = [
     "MedicalGraph",
@@ -71,7 +77,8 @@ __all__ = [
     "RelationType",
     "Severity",
     "AllergyType",
-    "ConfidenceLevel",
+    "ENTITY_TYPE_LABEL_ZH",
+    "RELATION_TYPE_LABEL_ZH",
     "Disease",
     "Symptom",
     "Drug",

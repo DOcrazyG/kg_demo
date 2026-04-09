@@ -2,34 +2,25 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from ._type import ConfidenceLevel, EntityType, RelationType
+from ._type import EntityType, RelationType
 
 
 class BaseEntity(BaseModel):
+    """医疗知识图谱实体基类（不含数据库主键与置信度，避免与抽取字段冗余）。"""
+
     model_config = ConfigDict(
         extra="ignore",
         populate_by_name=True,
         use_enum_values=False,
     )
 
-    id: Optional[int] = Field(None, description="Unique entity identifier")
-    name: str = Field(..., description="Entity name", examples=["高血压", "阿莫西林"])
-    entity_type: EntityType = Field(..., description="Entity type")
-    description: Optional[str] = Field(None, description="Entity description")
-    confidence: float = Field(
-        default=1.0,
-        ge=0.0,
-        le=1.0,
-        description="Extraction confidence [0, 1]",
-    )
-    confidence_level: ConfidenceLevel = Field(
-        default=ConfidenceLevel.HIGH,
-        description="Confidence level category",
-    )
-    source_text: Optional[str] = Field(None, description="Source text mention")
+    name: str = Field(..., description="实体规范名称（与原文 mention 对应）", examples=["2型糖尿病", "二甲双胍"])
+    entity_type: EntityType = Field(..., description="实体类型枚举")
+    description: Optional[str] = Field(None, description="补充说明（原文有据时填写）")
+    source_text: Optional[str] = Field(None, description="原文中的提及片段（与抽取对齐）")
     attributes: Dict[str, Any] = Field(
         default_factory=dict,
-        description="Additional attributes",
+        description="其它结构化属性（与 LangExtract attributes 对齐）",
     )
 
     @field_validator("entity_type", mode="before")
@@ -42,43 +33,26 @@ class BaseEntity(BaseModel):
         except ValueError:
             return EntityType.UNKNOWN
 
-    @field_validator("confidence_level", mode="before")
-    @classmethod
-    def parse_confidence_level(cls, v: Union[str, ConfidenceLevel]) -> ConfidenceLevel:
-        if isinstance(v, ConfidenceLevel):
-            return v
-        try:
-            return ConfidenceLevel(v.lower())
-        except ValueError:
-            return ConfidenceLevel.UNKNOWN
-
 
 class BaseRelation(BaseModel):
+    """医疗知识图谱关系基类（用名称+类型关联实体，不用数值 id）。"""
+
     model_config = ConfigDict(
         extra="ignore",
         populate_by_name=True,
         use_enum_values=False,
     )
 
-    id: Optional[int] = Field(None, description="Unique relation identifier")
-    source_id: Optional[int] = Field(None, description="Source entity ID")
-    target_id: Optional[int] = Field(None, description="Target entity ID")
-    source_name: str = Field(..., description="Source entity name")
-    target_name: str = Field(..., description="Target entity name")
-    source_type: EntityType = Field(..., description="Source entity type")
-    target_type: EntityType = Field(..., description="Target entity type")
-    relation: str = Field(..., description="Relation name")
-    relation_type: RelationType = Field(..., description="Relation type")
-    confidence: float = Field(
-        default=1.0,
-        ge=0.0,
-        le=1.0,
-        description="Extraction confidence [0, 1]",
-    )
-    source_text: Optional[str] = Field(None, description="Supporting text from source")
+    source_name: str = Field(..., description="头实体名称（与对应实体的 name / extraction_text 一致）")
+    target_name: str = Field(..., description="尾实体名称")
+    source_type: EntityType = Field(..., description="头实体类型")
+    target_type: EntityType = Field(..., description="尾实体类型")
+    relation: str = Field(..., description="关系可读名称（可与 relation_type 取值一致）")
+    relation_type: RelationType = Field(..., description="关系类型枚举")
+    source_text: Optional[str] = Field(None, description="支持该关系的原文证据片段")
     attributes: Dict[str, Any] = Field(
         default_factory=dict,
-        description="Additional relation attributes",
+        description="关系上的附加属性（如剂量、严重程度等）",
     )
 
     @field_validator("relation_type", mode="before")

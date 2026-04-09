@@ -1,5 +1,5 @@
 """
-Medical entities
+医疗实体类型（中文场景下的字段说明；类型键仍为英文 snake_case）。
 """
 
 from __future__ import annotations
@@ -19,13 +19,11 @@ class Disease(BaseEntity):
         populate_by_name=True,
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.DISEASE, description="Entity type"
-    )
+    entity_type: EntityType = Field(default=EntityType.DISEASE, description="实体类型")
     code: Optional[str] = Field(
-        None, description="ICD-10/ICD-9 code", examples=["I10", "E11.9"]
+        None, description="疾病编码（如 ICD-10/ICD-9，有则填）", examples=["I10", "E11.9"]
     )
-    alias: Optional[str] = Field(None, description="Alternative name")
+    alias: Optional[str] = Field(None, description="别名/俗称")
 
 
 class Symptom(BaseEntity):
@@ -33,9 +31,7 @@ class Symptom(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.SYMPTOM, description="Entity type"
-    )
+    entity_type: EntityType = Field(default=EntityType.SYMPTOM, description="实体类型")
 
 
 class Drug(BaseEntity):
@@ -44,14 +40,14 @@ class Drug(BaseEntity):
         populate_by_name=True,
     )
 
-    entity_type: EntityType = Field(default=EntityType.DRUG, description="Entity type")
+    entity_type: EntityType = Field(default=EntityType.DRUG, description="实体类型")
     dosage_form: Optional[str] = Field(
-        None, description="Dosage form", examples=["片剂", "胶囊"]
+        None, description="剂型", examples=["片剂", "胶囊", "注射液"]
     )
     strength: Optional[str] = Field(
-        None, description="Strength/concentration", examples=["500mg"]
+        None, description="规格/浓度", examples=["500mg", "0.5g"]
     )
-    atc_code: Optional[str] = Field(None, description="ATC classification code")
+    atc_code: Optional[str] = Field(None, description="ATC 分类编码（有则填）")
 
 
 class Food(BaseEntity):
@@ -59,7 +55,7 @@ class Food(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(default=EntityType.FOOD, description="Entity type")
+    entity_type: EntityType = Field(default=EntityType.FOOD, description="实体类型")
 
 
 class Department(BaseEntity):
@@ -67,9 +63,7 @@ class Department(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.DEPARTMENT, description="Entity type"
-    )
+    entity_type: EntityType = Field(default=EntityType.DEPARTMENT, description="实体类型")
 
 
 class Producer(BaseEntity):
@@ -77,9 +71,7 @@ class Producer(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.PRODUCER, description="Entity type"
-    )
+    entity_type: EntityType = Field(default=EntityType.PRODUCER, description="实体类型")
 
 
 class Treatment(BaseEntity):
@@ -87,9 +79,7 @@ class Treatment(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.TREATMENT, description="Entity type"
-    )
+    entity_type: EntityType = Field(default=EntityType.TREATMENT, description="实体类型")
 
 
 class Check(BaseEntity):
@@ -97,8 +87,10 @@ class Check(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(default=EntityType.CHECK, description="Entity type")
-    category: Optional[str] = Field(None, description="Category: lab, imaging, etc.")
+    entity_type: EntityType = Field(default=EntityType.CHECK, description="实体类型")
+    category: Optional[str] = Field(
+        None, description="类别：如实验室检查、影像学检查等"
+    )
 
 
 class Surgery(BaseEntity):
@@ -106,10 +98,8 @@ class Surgery(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.SURGERY, description="Entity type"
-    )
-    code: Optional[str] = Field(None, description="Procedure code (CPT, ICD-9-PCS)")
+    entity_type: EntityType = Field(default=EntityType.SURGERY, description="实体类型")
+    code: Optional[str] = Field(None, description="手术/操作编码（如 CPT、ICD-9-PCS）")
 
 
 class Patient(BaseEntity):
@@ -118,18 +108,16 @@ class Patient(BaseEntity):
         populate_by_name=True,
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.PATIENT, description="Entity type"
-    )
+    entity_type: EntityType = Field(default=EntityType.PATIENT, description="实体类型")
     patient_id: str = Field(
-        ..., description="Unique patient identifier", examples=["MRN-2024001"]
+        ...,
+        description="患者唯一标识（病历号等；原文无则可用占位如“患者”+上下文）",
+        examples=["MRN-2024001", "门诊-001"],
     )
-    date_of_birth: Optional[date] = Field(None, description="Date of birth")
-    gender: Optional[str] = Field(None, description="Gender")
-    phone: Optional[str] = Field(None, description="Contact phone")
-    id_number: Optional[str] = Field(
-        None, description="National ID or insurance number"
-    )
+    date_of_birth: Optional[date] = Field(None, description="出生日期")
+    gender: Optional[str] = Field(None, description="性别")
+    phone: Optional[str] = Field(None, description="联系电话")
+    id_number: Optional[str] = Field(None, description="身份证号或医保号等")
 
 
 class Physician(BaseEntity):
@@ -138,12 +126,10 @@ class Physician(BaseEntity):
         populate_by_name=True,
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.PHYSICIAN, description="Entity type"
-    )
-    license_number: Optional[str] = Field(None, description="Medical license number")
-    title: Optional[str] = Field(None, description="Professional title")
-    hospital: Optional[str] = Field(None, description="Affiliated hospital")
+    entity_type: EntityType = Field(default=EntityType.PHYSICIAN, description="实体类型")
+    license_number: Optional[str] = Field(None, description="执业证书编号")
+    title: Optional[str] = Field(None, description="职称")
+    hospital: Optional[str] = Field(None, description="所在医院/机构")
 
 
 class Diagnosis(BaseEntity):
@@ -151,12 +137,10 @@ class Diagnosis(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.UNKNOWN, description="Entity type"
-    )
-    code: Optional[str] = Field(None, description="ICD-10/ICD-9 code", examples=["I10"])
-    severity: Optional[Severity] = Field(None, description="Diagnosis severity")
-    is_primary: Optional[bool] = Field(None, description="Primary diagnosis flag")
+    entity_type: EntityType = Field(default=EntityType.DIAGNOSIS, description="实体类型")
+    code: Optional[str] = Field(None, description="诊断编码（ICD 等）", examples=["I10"])
+    severity: Optional[Severity] = Field(None, description="严重程度")
+    is_primary: Optional[bool] = Field(None, description="是否主要诊断")
 
 
 class LabTest(BaseEntity):
@@ -164,11 +148,9 @@ class LabTest(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.LAB_TEST, description="Entity type"
-    )
-    test_code: Optional[str] = Field(None, description="LOINC or local code")
-    category: Optional[str] = Field(None, description="Test category")
+    entity_type: EntityType = Field(default=EntityType.LAB_TEST, description="实体类型")
+    test_code: Optional[str] = Field(None, description="检验项目编码（LOINC 或院内码）")
+    category: Optional[str] = Field(None, description="检验大类")
 
 
 class Procedure(BaseEntity):
@@ -176,12 +158,10 @@ class Procedure(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.PROCEDURE, description="Entity type"
-    )
-    procedure_code: Optional[str] = Field(None, description="CPT, ICD-9-PCS code")
+    entity_type: EntityType = Field(default=EntityType.PROCEDURE, description="实体类型")
+    procedure_code: Optional[str] = Field(None, description="操作编码")
     procedure_type: Optional[str] = Field(
-        None, description="surgery, imaging, examination"
+        None, description="操作类型：如手术、影像、检查等"
     )
 
 
@@ -190,15 +170,13 @@ class Prescription(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.PRESCRIPTION, description="Entity type"
-    )
-    drug_name: str = Field(..., description="Drug name")
-    dosage: Optional[str] = Field(None, description="Dosage instructions")
-    frequency: Optional[str] = Field(None, description="Frequency")
-    duration: Optional[str] = Field(None, description="Duration")
-    quantity: Optional[str] = Field(None, description="Quantity prescribed")
-    route: Optional[str] = Field(None, description="Route of administration")
+    entity_type: EntityType = Field(default=EntityType.PRESCRIPTION, description="实体类型")
+    drug_name: str = Field(..., description="药品名称")
+    dosage: Optional[str] = Field(None, description="用法用量说明")
+    frequency: Optional[str] = Field(None, description="频次")
+    duration: Optional[str] = Field(None, description="疗程")
+    quantity: Optional[str] = Field(None, description="开药数量")
+    route: Optional[str] = Field(None, description="给药途径")
 
 
 class Allergy(BaseEntity):
@@ -206,13 +184,11 @@ class Allergy(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.ALLERGY, description="Entity type"
-    )
-    allergen: str = Field(..., description="Allergen (drug, food, substance)")
-    allergy_type: Optional[AllergyType] = Field(None, description="Allergy type")
-    reaction: Optional[str] = Field(None, description="Reaction description")
-    onset_date: Optional[date] = Field(None, description="Onset date")
+    entity_type: EntityType = Field(default=EntityType.ALLERGY, description="实体类型")
+    allergen: str = Field(..., description="过敏原（药物、食物、物质等）")
+    allergy_type: Optional[AllergyType] = Field(None, description="过敏类型")
+    reaction: Optional[str] = Field(None, description="反应描述")
+    onset_date: Optional[date] = Field(None, description="发生日期")
 
 
 class VitalSign(BaseEntity):
@@ -220,23 +196,19 @@ class VitalSign(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.VITAL_SIGN, description="Entity type"
-    )
+    entity_type: EntityType = Field(default=EntityType.VITAL_SIGN, description="实体类型")
     blood_pressure_systolic: Optional[float] = Field(
-        None, description="Systolic BP (mmHg)"
+        None, description="收缩压（mmHg）"
     )
     blood_pressure_diastolic: Optional[float] = Field(
-        None, description="Diastolic BP (mmHg)"
+        None, description="舒张压（mmHg）"
     )
-    heart_rate: Optional[float] = Field(None, description="Heart rate (bpm)")
-    temperature: Optional[float] = Field(None, description="Body temperature (°C)")
-    respiratory_rate: Optional[float] = Field(
-        None, description="Respiratory rate (/min)"
-    )
-    oxygen_saturation: Optional[float] = Field(None, description="SpO2 (%)")
-    weight_kg: Optional[float] = Field(None, description="Weight (kg)")
-    height_cm: Optional[float] = Field(None, description="Height (cm)")
+    heart_rate: Optional[float] = Field(None, description="心率（次/分）")
+    temperature: Optional[float] = Field(None, description="体温（℃）")
+    respiratory_rate: Optional[float] = Field(None, description="呼吸频率（次/分）")
+    oxygen_saturation: Optional[float] = Field(None, description="血氧饱和度（%）")
+    weight_kg: Optional[float] = Field(None, description="体重（kg）")
+    height_cm: Optional[float] = Field(None, description="身高（cm）")
 
 
 class LabValue(BaseEntity):
@@ -244,15 +216,13 @@ class LabValue(BaseEntity):
         extra="ignore",
     )
 
-    entity_type: EntityType = Field(
-        default=EntityType.LAB_VALUE, description="Entity type"
-    )
-    test_name: str = Field(..., description="Name of the lab test")
-    value: Optional[Union[str, float]] = Field(None, description="Test result value")
-    unit: Optional[str] = Field(None, description="Unit of measurement")
-    reference_range: Optional[str] = Field(None, description="Normal reference range")
+    entity_type: EntityType = Field(default=EntityType.LAB_VALUE, description="实体类型")
+    test_name: str = Field(..., description="检验项目名称")
+    value: Optional[Union[str, float]] = Field(None, description="检验结果值")
+    unit: Optional[str] = Field(None, description="单位")
+    reference_range: Optional[str] = Field(None, description="参考范围")
     abnormal_flag: Optional[str] = Field(
-        None, description="Abnormality indicator: H, L, HH, LL"
+        None, description="异常标识：如偏高 H、偏低 L 等"
     )
 
 

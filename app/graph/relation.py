@@ -1,4 +1,4 @@
-"""Medical relations."""
+"""医疗关系类型（中文说明）。"""
 
 from __future__ import annotations
 
@@ -13,161 +13,161 @@ from .base import BaseRelation
 class DiseaseHasSymptom(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_HAS_SYMPTOM,
-        description="Disease has symptom relation",
+        description="疾病表现/伴有某症状",
     )
 
 
 class DiseaseCommonDrug(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_COMMON_DRUG,
-        description="Disease commonly used drug",
+        description="疾病常用治疗药物",
     )
 
 
 class DiseaseRecommandDrug(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_RECOMMAND_DRUG,
-        description="Disease recommended drug",
+        description="疾病推荐/建议用药",
     )
 
 
 class DiseaseBelongDepartment(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_BELONG_DEPARTMENT,
-        description="Disease belongs to department",
+        description="疾病归属科室（诊疗分科）",
     )
 
 
 class DiseaseAccompanyDisease(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_ACOMPANY_DISEASE,
-        description="Disease accompanies disease (comorbidity)",
+        description="合并症/伴随疾病",
     )
 
 
 class DiseaseEatFood(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_EAT_FOOD,
-        description="Disease can eat food",
+        description="疾病适宜摄入的食物",
     )
 
 
 class DiseaseNoteatFood(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_NOTEAT_FOOD,
-        description="Disease should avoid food",
+        description="疾病应避免的食物",
     )
 
 
 class DiseaseRecommandFood(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_RECOMMAND_FOOD,
-        description="Disease recommended food",
+        description="疾病推荐食物",
     )
 
 
 class DiseaseNeedCheck(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_NEED_CHECK,
-        description="Disease requires check/exam",
+        description="疾病需要做的检查/检验",
     )
 
 
 class DiseaseNeedTreatment(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DISEASE_NEED_TREATMENT,
-        description="Disease requires treatment",
+        description="疾病需要的治疗方式",
     )
 
 
 class DrugRelateProducer(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DRUG_RELATE_PRODUCER,
-        description="Drug related to producer/manufacturer",
+        description="药品与生产企业",
     )
 
 
 class DepartmentBelongDepartment(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DEPARTMENT_BELONG_DEPARTMENT,
-        description="Department belongs to parent department",
+        description="科室隶属上级科室",
     )
 
 
 class PatientHasDiagnosis(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PATIENT_HAS_DIAGNOSIS,
-        description="Patient has diagnosis",
+        description="患者被赋予某诊断",
     )
-    severity: Optional[Severity] = Field(None, description="Diagnosis severity")
-    is_primary: Optional[bool] = Field(None, description="Primary diagnosis")
+    severity: Optional[Severity] = Field(None, description="诊断严重程度")
+    is_primary: Optional[bool] = Field(None, description="是否主要诊断")
 
 
 class PatientPrescribedMedication(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PATIENT_PRESCRIBED_MEDICATION,
-        description="Patient prescribed medication",
+        description="患者用药/开立药物",
     )
-    dosage: Optional[str] = Field(None, description="Dosage instructions")
-    frequency: Optional[str] = Field(None, description="Frequency")
-    duration: Optional[str] = Field(None, description="Treatment duration")
+    dosage: Optional[str] = Field(None, description="用法用量")
+    frequency: Optional[str] = Field(None, description="用药频次")
+    duration: Optional[str] = Field(None, description="疗程")
 
 
 class PatientHasAllergy(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PATIENT_HAS_ALLERGY,
-        description="Patient has allergy",
+        description="患者有过敏史",
     )
-    allergy_type: Optional[AllergyType] = Field(None, description="Allergy type")
-    reaction: Optional[str] = Field(None, description="Allergic reaction")
+    allergy_type: Optional[AllergyType] = Field(None, description="过敏类型")
+    reaction: Optional[str] = Field(None, description="过敏反应描述")
 
 
 class PatientHasLabTest(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PATIENT_HAS_LAB_TEST,
-        description="Patient has lab test",
+        description="患者进行/开具某检验",
     )
 
 
 class PhysicianBelongsToDepartment(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PHYSICIAN_BELONGS_TO_DEPARTMENT,
-        description="Physician belongs to department",
+        description="医护人员所属科室",
     )
 
 
 class LabTestMapToCheck(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.LAB_TEST_MAP_TO_CHECK,
-        description="Lab test maps to check entity",
+        description="检验项目对应检查项目",
     )
 
 
 class ProcedureMapToCheck(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PROCEDURE_MAP_TO_CHECK,
-        description="Procedure maps to check entity",
+        description="操作/处置对应检查",
     )
 
 
 class ProcedureMapToSurgery(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PROCEDURE_MAP_TO_SURGERY,
-        description="Procedure maps to surgery entity",
+        description="操作/处置对应手术",
     )
 
 
 class PrescriptionReferencesDrug(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.PRESCRIPTION_REFERENCES_DRUG,
-        description="Prescription references drug entity",
+        description="处方涉及的具体药品",
     )
 
 
 class DiagnosisMapsToDisease(BaseRelation):
     relation_type: RelationType = Field(
         default=RelationType.DIAGNOSIS_MAPS_TO_DISEASE,
-        description="Diagnosis maps to disease entity",
+        description="诊断对应到标准/规范化疾病",
     )
 
 

@@ -1,6 +1,4 @@
-"""
-Medical graph
-"""
+"""中文医疗知识图谱：实体与关系类型清单（与 ``entity`` / ``relation`` 模块一致）。"""
 
 from .base import BaseGraph
 from .entity import (
